@@ -13,6 +13,9 @@ using Reexport
 # 工具函数(不导出)
 include("Util.jl")
 
+# 总体定义
+include("general.jl")
+
 # 前端
 include("Frontend.jl")
 @reexport using .Frontend
@@ -20,5 +23,8 @@ include("Frontend.jl")
 # 后端
 include("Backend.jl")
 @reexport using .Backend
+
+# 二者结合
+include("combinations.jl")
 
 end # module NAVM

@@ -109,7 +109,17 @@ const NAIR_RULES::Dict = Dict(
                 ),
             )
             for (instruction_cmd, dict) in NAIR_INSTRUCTION_SET
-        )...
+        )...,
+        # 默认（用户自定义）指令
+        :_DEFAULT => P.seq(
+            :identifier, # 指令头(通用)
+            :spaces, # 分隔符
+            :raw_line, # 内容
+            P.first( # 换行符/输入结束
+                :new_line,
+                P.end_of_input
+            ),
+        )
     ),
 )
 
@@ -145,7 +155,12 @@ const NAIR_FOLDS::Dict = Dict(
             filter!(!isnothing, subvals)... # 自动过滤并展开
         ) # 自动展开
         for (instruction_cmd, dict) in NAIR_INSTRUCTION_SET
-    )...
+    )...,
+    # 默认（用户自定义）指令
+    :_DEFAULT => (str, subvals::Vector) -> begin
+        @show args::Vector = filter!(!isnothing, subvals) # 自动过滤
+        return form_cmd(Symbol(args[1]), args[2:end]...) # 不会溢出
+    end,
 )
 
 "规则入口"
@@ -207,3 +222,4 @@ end
 @show parse_cmd("SAV NARS-1 test/nars1.nal")
 @show parse_cmd("NSE <A --> B>.")
 @assert try_parse_cmd("NSE NARS-1 test/nars1.nal") |> isnothing
+@show parse_cmd("CUS This is my custom cmd.")

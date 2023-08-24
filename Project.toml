@@ -9,10 +9,9 @@ JuNarseseParsers = "0a59fa39-45d5-416d-90fd-544de8e6e92c"
 PikaParser = "3bbf5609-3e7b-44cd-8549-7c69f321e792"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
-
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 JuNarseseParsers = "0a59fa39-45d5-416d-90fd-544de8e6e92c"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Test"]

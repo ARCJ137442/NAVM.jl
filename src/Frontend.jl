@@ -13,7 +13,6 @@ include("Frontend/NAIR.jl")
 @reexport using .NAIR
 
 # 前端模块
-include("Frontend/Module.jl")
-@reexport using .Module
+include("Frontend/module.jl")
 
 end # module

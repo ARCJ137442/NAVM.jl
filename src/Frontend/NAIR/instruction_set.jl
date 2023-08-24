@@ -1,5 +1,5 @@
 # 导出
-export NAIR_INSTRUCTION_SET, NAIR_INSTRUCTION_INF_KEYS
+export NAIR_INSTRUCTION_SET, NAIR_INSTRUCTIONS, NAIR_INSTRUCTION_INF_KEYS
 
 """
 # NAIR的基础指令集
@@ -155,7 +155,13 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
 ])
 
 """
-上述指令集数组中「信息字典」的所有键
+上述指令集中的所有指令KeySet
+- 会随着指令集的更新而更新
+"""
+NAIR_INSTRUCTIONS::Base.KeySet = keys(NAIR_INSTRUCTION_SET)
+
+"""
+上述指令集中「信息字典」的所有键
 - 要求的参数集
 - 帮助文档
 """

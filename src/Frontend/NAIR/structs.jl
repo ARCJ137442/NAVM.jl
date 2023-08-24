@@ -19,7 +19,9 @@ const NAIR_CMD_TYPE::DataType = Expr
 """
 function form_cmd(head::Symbol, params...)::NAIR_CMD_TYPE
     # 检查
-    NAIR_INSTRUCTION_SET[head][:check_f](params...) || error("$head: 参数集「$params」非法！")
+    if head in NAIR_INSTRUCTIONS
+        NAIR_INSTRUCTION_SET[head][:check_f](params...) || error("$head: 参数集「$params」非法！")
+    end
     # 构建
     Expr(head, params...)
 end

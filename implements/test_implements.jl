@@ -6,12 +6,19 @@
 
 module Implements
 
-# 自动导入JuNarsese模块
-push!(LOAD_PATH, "../JuNarsese")
-push!(LOAD_PATH, "../JuNarseseParsers")
+# 导入JuNarsese及其解析器
+if !all(
+        isdefined(Main, s)
+        for s in [:JuNarsese, :JuNarseseParsers]
+    )
+    push!(LOAD_PATH, "../JuNarsese")
+    push!(LOAD_PATH, "../JuNarseseParsers/")
 
-using JuNarsese
-using JuNarseseParsers
+    # 自动导入JuNarsese模块
+    using JuNarseseParsers
+    using JuNarseseParsers.JuNarsese
+    
+end
 
 # 导入NAVM
 if !(@isdefined NAVM)

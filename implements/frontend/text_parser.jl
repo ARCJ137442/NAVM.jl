@@ -8,17 +8,33 @@
 """
 struct TextParserModule <: NAVM.FrontendModule
 
-    parser::JuNarsese.AbstractParser
+    parser::JuNarsese.TAbstractParser
     
 end
 
 source_type(::TextParserModule)::Type = AbstractString
 
-transform(m::TextParserModule, source::AbstractString) = @show m.parser NAVM.form_cmd(
-    :NSE, # 只有Narsese输入
-    m.parser(m) # 自动解析
-)
+"扩展的解析函数"
+function transform(m::TextParserModule, source::AbstractString)
+    # 尝试解析出循环步进
+    n::Union{Int, Nothing} = tryparse(Int, source)
+    isnothing(n) || return NAVM.form_cmd(
+        :CYC, # 输入循环步进
+        n,
+    )
+    # 最后再尝试解析成Narsese输入
+    NAVM.form_cmd(
+        :NSE, # 输入Narsese
+        m.parser(source) # 自动解析
+    )
+end
 
+# 测试
 p = TextParserModule(StringParser_ascii)
+p2 = TextParserModule(SExprParser)
 
 @show transform(p, "<A --> B>.")
+@show p2.([
+    "(Inheritance (Word A) (Word B))"
+    "12"
+])
