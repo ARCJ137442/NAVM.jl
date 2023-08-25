@@ -52,22 +52,32 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
     :SAV => Dict(
         :params   => [:identifier, :file_path],
         :help_inf => """
-            保存当前数据到文件
+            保存当前数据（记忆）到文件
             """, # 这里的「行首」对齐末尾三引号左侧，在此例中将解析出没有行首空白符的文本
-        :fold_f   => (head, str, name, path) -> begin
+        :fold_f   => (head::Symbol, str::AbstractString, name::AbstractString, path::AbstractString) -> begin
             form_cmd(head, name, path)
         end,
-        :check_f  => (arg...) -> (@show "WIP!" true),
+        :check_f  => (::AbstractString, path="") -> true,
     )
     :LOA => Dict(
         :params   => [:identifier, :file_path],
         :help_inf => """
-            从文件加载数据
+            从文件加载数据（记忆）
             """,
-        :fold_f   => (head, str, name, path) -> begin
+        :fold_f   => (head::Symbol, str::AbstractString, name::AbstractString, path::AbstractString) -> begin
             form_cmd(head, name, path)
         end,
-        :check_f  => (arg...) -> (@show "WIP!" true),
+        :check_f  => (::AbstractString, path="") -> true,
+    )
+    :RES => Dict(
+        :params   => [:identifier],
+        :help_inf => """
+            清除CIN数据（记忆）
+            """,
+        :fold_f   => (head::Symbol, str::AbstractString, name::AbstractString) -> begin
+            form_cmd(head, name)
+        end,
+        :check_f  => (::AbstractString, name="") -> true,
     )
     #= IO =#
     :NSE => Dict(
@@ -77,7 +87,7 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
             - 不换行
             - 遵循CommonNarsese语法
             """,
-        :fold_f   => (head, str, narsese) -> begin
+        :fold_f   => (head::Symbol, str::AbstractString, narsese) -> begin
             form_cmd(
                 head, 
                 JuNarsese.StringParser_ascii( # 自动解析成词项
@@ -89,22 +99,22 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
     )
     #= CIN控制 =#
     :NEW => Dict(
-        :params   => [:identifier],
+        :params   => [],
         :help_inf => """
             创建新推理器
             """,
-        :fold_f   => (arg...) -> begin
-            @info "WIP!" arg
+        :fold_f   => (head::Symbol, str::AbstractString, arg...) -> begin
+            @info "$head: WIP!" arg
         end,
         :check_f  => (arg...) -> (@show "WIP!" true),
     )
     :DEL => Dict(
-        :params   => [:identifier],
+        :params   => [],
         :help_inf => """
             删除(停止)推理器
             """,
-        :fold_f   => (arg...) -> begin
-            @info "WIP!" arg
+        :fold_f   => (head::Symbol, str::AbstractString, arg...) -> begin
+            @info "$head: WIP!" arg
         end,
         :check_f  => (arg...) -> (@show "WIP!" true),
     )
@@ -113,23 +123,39 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :help_inf => """
             控制CIN步进
             """,
-        :fold_f   => (head, str, cycles) -> begin
+        :fold_f   => (head::Symbol, str::AbstractString, cycles::Integer) -> begin
             form_cmd(
                 head,
                 cycles,
             )
         end,
-        :check_f  => (arg...) -> (@show "WIP!" true),
+        :check_f  => (::Integer) -> true,
     )
     :VOL => Dict(
         :params   => [:uint],
         :help_inf => """
             控制CIN输出音量
             """,
-        :fold_f   => (arg...) -> begin
-            @info "WIP!" arg
+        :fold_f   => (head::Symbol, str::AbstractString, vol::Integer) -> begin
+            form_cmd(
+                head,
+                vol
+            )
         end,
-        :check_f  => (arg...) -> (@show "WIP!" true),
+        :check_f  => (::Integer) -> true,
+    )
+    :INF => Dict(
+        :params   => [:identifier],
+        :help_inf => """
+            让CIN输出某类信息
+            """,
+        :fold_f   => (head::Symbol, str::AbstractString, flag) -> begin
+            form_cmd(
+                head,
+                flag
+            )
+        end,
+        :check_f  => (arg...) -> true,
     )
     #= 其它 =#
     :HLP => Dict(
@@ -137,20 +163,18 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :help_inf => """
             打印帮助文档
             """,
-        :fold_f   => (arg...) -> begin
-            @info "WIP!" arg
+        :fold_f   => (head::Symbol, str::AbstractString, arg...) -> begin
+            @info "$head: WIP!" arg
         end,
-        :check_f  => (arg...) -> (@show "WIP!" true),
+        :check_f  => (arg...) -> (@show :HLP true),
     )
     :REM => Dict(
         :params   => [:raw_line],
         :help_inf => """
             内容仅作为注释，永不执行
             """,
-        :fold_f   => (arg...) -> begin
-            @info "WIP!" arg
-        end,
-        :check_f  => (arg...) -> (@show "WIP!" true),
+        :fold_f   => (head::Symbol, str::AbstractString, arg...) -> nothing, # 不解析
+        :check_f  => (arg...) -> true,
     )
 ])
 

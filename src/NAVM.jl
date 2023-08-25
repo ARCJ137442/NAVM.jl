@@ -16,6 +16,10 @@ include("Util.jl")
 # 总体定义
 include("general.jl")
 
+# 中间语NAIR
+include("NAIR.jl")
+@reexport using .NAIR
+
 # 前端
 include("Frontend.jl")
 @reexport using .Frontend

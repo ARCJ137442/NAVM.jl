@@ -8,10 +8,6 @@ module Frontend
 # 导入
 using Reexport
 
-# NAIR
-include("Frontend/NAIR.jl")
-@reexport using .NAIR
-
 # 前端模块
 include("Frontend/module.jl")
 

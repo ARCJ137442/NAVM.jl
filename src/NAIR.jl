@@ -6,7 +6,6 @@ NAIR: NAVM的中间语言
 module NAIR
 
 # 导入
-push!(LOAD_PATH, "../JuNarsese") # 否则找不到路径
 using JuNarsese
 
 # 数据结构

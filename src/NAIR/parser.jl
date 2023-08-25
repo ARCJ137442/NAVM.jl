@@ -8,6 +8,7 @@ import PikaParser as P
 
 # 导出
 export NAIR_RULES, NAIR_GRAMMAR, NAIR_FOLDS
+export parse_cmd, tryparse_cmd
 
 """
 在参数中间隔插入空格
@@ -158,19 +159,20 @@ const NAIR_FOLDS::Dict = Dict(
     )...,
     # 默认（用户自定义）指令
     :_DEFAULT => (str, subvals::Vector) -> begin
-        @show args::Vector = filter!(!isnothing, subvals) # 自动过滤
+        @info "自定义指令通道：" str subvals
+        args::Vector = filter!(!isnothing, subvals) # 自动过滤
         return form_cmd(Symbol(args[1]), args[2:end]...) # 不会溢出
     end,
 )
 
 "规则入口"
-const RULE_START::Symbol = :instruction
+const NAIR_RULE_START::Symbol = :instruction
 
 """
 NAIR语法
 """
 const NAIR_GRAMMAR::P.Grammar = P.make_grammar(
-    [RULE_START], # 入口(此处限制到只有一个)
+    [NAIR_RULE_START], # 入口(此处限制到只有一个)
     P.flatten(NAIR_RULES, Char) # 扁平化
 )
 
@@ -187,13 +189,15 @@ function _default_fold(str, subvals)
 end
 
 """
-解析字符串格式NAIR的主函数
+解析「NAIR字符串」为「单个NAIR指令」的主函数
+
+【20230825 15:16:55】Pika解析器不支持在SubString上解析！
 """
 function parse_cmd(str::String)::NAIR_CMD_TYPE
 
     state::P.ParserState = P.parse(NAIR_GRAMMAR, str)
 
-    match::Union{Integer, Nothing} = P.find_match_at!(state, RULE_START, 1)
+    match::Union{Integer, Nothing} = P.find_match_at!(state, NAIR_RULE_START, 1)
                 
     (isnothing(match) || match < 1) && error("NAIR: 解析「$str」失败！match = $match")
 
@@ -205,21 +209,16 @@ function parse_cmd(str::String)::NAIR_CMD_TYPE
         )(m.view, s),
     )
 end
+parse_cmd(str::AbstractString)::NAIR_CMD_TYPE = parse_cmd(string(str))
 
 """
 软解析：报错时返回nothing
 """
-function try_parse_cmd(str::String)::Union{NAIR_CMD_TYPE, Nothing}
+function tryparse_cmd(str::String)::Union{NAIR_CMD_TYPE, Nothing}
     try
         return parse_cmd(str)
     catch
         return nothing
     end
 end
-
-# 测试
-@show parse_cmd("CYC    1")
-@show parse_cmd("SAV NARS-1 test/nars1.nal")
-@show parse_cmd("NSE <A --> B>.")
-@assert try_parse_cmd("NSE NARS-1 test/nars1.nal") |> isnothing
-@show parse_cmd("CUS This is my custom cmd.")
+tryparse_cmd(str::AbstractString)::Union{NAIR_CMD_TYPE, Nothing} = tryparse_cmd(string(str))
