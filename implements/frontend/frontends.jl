@@ -3,4 +3,4 @@
 =#
 
 # 导入
-include("frontend/text_parser.jl")
+include("text_parser.jl")

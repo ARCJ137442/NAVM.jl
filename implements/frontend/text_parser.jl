@@ -13,13 +13,13 @@ struct FE_TextParser <: NAVM.FrontendModule
 
     "字符串解析器"
     parser::JuNarsese.TAbstractParser
-    
+
 end
 
 source_type(::FE_TextParser)::Type = AbstractString
 
 "扩展的解析函数"
-function transform(m::FE_TextParser, source::AbstractString)::Vector{NAIR_CMD_TYPE}
+function transform(m::FE_TextParser, source::AbstractString)::Vector{NAIR_CMD}
     # 如果分多行，按序列再解析
     splits::Vector{AbstractString} = split(source, r"[\r\n]+")
     length(splits) > 1 && return vcat((
@@ -39,7 +39,7 @@ function transform(m::FE_TextParser, source::AbstractString)::Vector{NAIR_CMD_TY
         NAVM.parse_cmd(source[2:end])
     ]
     # 尝试解析出循环步进
-    n::Union{Int, Nothing} = tryparse(Int, source)
+    n::Union{Int,Nothing} = tryparse(Int, source)
     isnothing(n) || return [
         NAVM.form_cmd(
             :CYC, # 输入循环步进

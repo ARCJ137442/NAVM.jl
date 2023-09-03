@@ -8,16 +8,16 @@ export BE_OpenNARS
 "实现一个后端"
 struct BE_OpenNARS <: BE_CommonCIN end
 
-begin "方法实现"
+begin # 方法实现
 
     "实现OpenNARS的Narsese输入: CommonNarsese"
-    @nair_rule NSE(be::BE_OpenNARS, narsese::TNarsese) narsese2data(StringParser_ascii, narsese)
+    transform(::BE_OpenNARS, cmd::CMD_NSE) = String[narsese2data(StringParser_ascii, cmd.narsese)]
 
     "实现OpenNARS的推理步进指令"
-    @nair_rule CYC(be::BE_OpenNARS, n::Integer) string(n)
+    transform(::BE_OpenNARS, cmd::CMD_CYC) = String[string(cmd.steps)]
 
     "实现OpenNARS的音量调节"
-    @nair_rule VOL(be::BE_OpenNARS, n::Integer) "*volume=$n"
+    transform(::BE_OpenNARS, cmd::CMD_VOL) = String["*volume=$(cmd.volume)"]
 
     # "实现OpenNARS的记忆存储" # 不一定有「存储路径」
     # function transform(::BE_OpenNARS, ::Val{:SAV}, object::AbstractString, path::AbstractString="")::Vector{String}

@@ -2,13 +2,11 @@
 测试前后端实现
 =#
 
-begin "模块导入"
+begin
+    "模块导入"
     # JuNarsese(Parsers)
     push!(LOAD_PATH, "../JuNarsese")
     push!(LOAD_PATH, "../JuNarseseParsers")
-
-    using JuNarsese
-    using JuNarseseParsers
 
     # 导入NAVM
     if !(@isdefined NAVM)
@@ -17,6 +15,9 @@ begin "模块导入"
         import NAVM: source_type, target_type, transform # 添加方法
         @info "NAVM导入成功！" names(NAVM)
     end
+
+    using JuNarseseParsers
+    using JuNarsese
 
     include("Implements.jl")
     using .Implements
@@ -46,13 +47,16 @@ bep = BE_NARS_Python()
 bey = BE_PyNARS()
 bej = BE_OpenJunars()
 
-@show bej([
-    form_cmd(:REM, "这是一段不会被翻译的注释")
-    form_cmd(:NSE, nse"<A --> B>.")
-    form_cmd(:NSE, nse"<B --> C>.")
-    form_cmd(:CYC, 5)
-    form_cmd(:UNK, 5, Operator, Int, :a123, r"123", nse"<A --> B>.")
-])
+@show bej(filter!(
+    !isnothing,
+    [
+        try_form_cmd(:REM, "这是一段不会被翻译的注释")
+        try_form_cmd(:NSE, nse"<A --> B>.")
+        CMD_NSE(nse"<B --> C>.")
+        try_form_cmd(:CYC, 5)
+        try_form_cmd(:UNK, 5, Operator, Int, :a123, r"123", nse"<A --> B>.")
+    ]
+))
 
 # 前后端连接测试
 chain_f::Function = chain(fea, bej)

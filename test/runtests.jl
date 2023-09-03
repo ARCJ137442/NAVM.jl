@@ -1,10 +1,8 @@
-begin "模块导入"
+begin
+    "模块导入"
     # JuNarsese(Parsers)
     push!(LOAD_PATH, "../JuNarsese")
     push!(LOAD_PATH, "../JuNarseseParsers")
-
-    using JuNarsese
-    using JuNarseseParsers
 
     # 导入NAVM
     if !(@isdefined NAVM)
@@ -13,6 +11,9 @@ begin "模块导入"
         import NAVM: source_type, target_type, transform # 添加方法
         @info "NAVM导入成功！" names(NAVM)
     end
+
+    using JuNarseseParsers
+    using JuNarsese
 
 end
 
@@ -24,8 +25,8 @@ ENV["JULIA_DEBUG"] = "all"
 @show parse_cmd("SAV NARS-1 test/nars1.nal")
 @show parse_cmd("NSE <A --> B>.")
 @assert tryparse_cmd("NSE NARS-1 test/nars1.nal") |> isnothing
-@show tryparse_cmd("CYC This cmd may causes an error.")
-@show parse_cmd("CUS This is my custom cmd.")
+@show tryparse_cmd("CYC This cmd may causes an error or be parsed to nothing.")
+# @show parse_cmd("CUS This is my custom cmd.") # 【20230903 22:17:00】现在不再默许指令集之外的「自定义指令」
 
 # 测试前后端实现
 @info "开始测试前后端实现..."

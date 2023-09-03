@@ -9,7 +9,6 @@ module Backend
 using ..Frontend # 导入前端
 
 # 后端模块
-include("Backend/module.jl")
-# @reexport using .Module
+include("module.jl")
 
 end # module

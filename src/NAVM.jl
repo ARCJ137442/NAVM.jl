@@ -17,15 +17,15 @@ include("Util.jl")
 include("general.jl")
 
 # 中间语NAIR
-include("NAIR.jl")
+include("NAIR/NAIR.jl")
 @reexport using .NAIR
 
 # 前端
-include("Frontend.jl")
+include("Frontend/Frontend.jl")
 @reexport using .Frontend
 
 # 后端
-include("Backend.jl")
+include("Backend/Backend.jl")
 @reexport using .Backend
 
 # 二者结合

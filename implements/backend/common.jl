@@ -4,19 +4,19 @@
 abstract type BE_CommonCIN <: BackendModule end
 
 "JuNarsese中所有Narsese元素的类型"
-TNarsese::Type = Union{ATerm, ASentence, ATask}
+TNarsese::Type = Union{ATerm,ASentence,ATask}
 
-"目标类型：字符串"
+"目标类型：字符串数组（因为有可能「一指令多字串」）"
 target_type(::BE_CommonCIN) = String
 
-"实现注释"
-function transform(::BE_CommonCIN, ::Val{:REM}, comment::AbstractString)::Vector{String}
+"统一实现注释"
+function transform(::BE_CommonCIN, comment::CMD_REM)::Vector{String}
     @info comment
     String[] # 空数组
 end
 
-"对未知指令的处理：静默失败"
-function transform(be::BE_CommonCIN, ::Val{head}, args::Vararg)::Vector{String} where head
-    @debug "$be: 未知的指令「$head $(join(args, ' '))」" # nothing
+"对未注册指令的处理：静默失败"
+function transform(be::BE_CommonCIN, cmd::NAIR_CMD)::Vector{String}
+    @debug "$be: 未注册的指令「$cmd」，已自动返回空数组" # nothing
     String[] # 空数组
 end

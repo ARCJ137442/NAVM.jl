@@ -3,72 +3,56 @@ NAIR的数据结构
 =#
 
 # 导出
-export NAIR_CMD_TYPE
-export form_cmd, load_cmds, get_head, get_args
+export NARSESE_TYPE
+export NAIR_CMD
+export CMD_SAV, CMD_LOA, CMD_RES, CMD_NSE, CMD_NEW, CMD_DEL, CMD_CYC, CMD_VOL, CMD_INF, CMD_HLP, CMD_REM
 
 """
-直接使用「表达式(Julia的Expr)数组」实现NAIR语句（串）
-- Expr.head: 指令标识符
-- Expr.args: 指令参数
+NAVM认为的Narsese类型
+- 基于JuNarsese
 """
-const NAIR_CMD_TYPE::DataType = Expr
+const NARSESE_TYPE::Type = Union{ATerm,ASentence,ATask}
 
 """
-通过「表达式头+参数集」的形式，提供指令组装API
-- 此处的`head`应为指令集中的一个有效指令
+抽象的一个指令形式，表示为一个抽象类型，利用Julia对象优化机制，避免额外的资源浪费
 """
-function form_cmd(head::Symbol, params...)::NAIR_CMD_TYPE
-    # 检查
-    if head in NAIR_INSTRUCTIONS
-        NAIR_INSTRUCTION_SET[head][:check_f](params...) || error("$head: 参数集「$params」非法！")
-    end
-    # 构建
-    Expr(head, params...)
+abstract type NAIR_CMD end
+
+#= 数据存取 =#
+struct CMD_SAV <: NAIR_CMD
+    object::String
+    to::String
+end
+struct CMD_LOA <: NAIR_CMD
+    object::String
+    to::String
+end
+struct CMD_RES <: NAIR_CMD
+    object::String
 end
 
-"""
-通过一个单一的、可空的「参数数组」抽取指令对象
-- 忽略其中的空值
-- 首个非空参数被视作指令头
-"""
-function form_cmd(args::Vector)::NAIR_CMD_TYPE
-    # 过滤
-    params::Vector = filter(!isnothing, args)
-    # 取头
-    head::Symbol = popfirst!(params)
-    # 构建
-    form_cmd(
-        head,
-        params...
-    )
+#= IO =#
+struct CMD_NSE <: NAIR_CMD
+    narsese::NARSESE_TYPE
 end
 
-"""
-组装多个命令：迭代器形式
-"""
-load_cmds(cmd_iter::Union{Vector,Tuple,Base.Generator})::Vector{NAIR_CMD_TYPE} = collect(cmd_iter)
+#= CIN控制 =#
+struct CMD_NEW <: NAIR_CMD end
+struct CMD_DEL <: NAIR_CMD end
+struct CMD_CYC <: NAIR_CMD
+    steps::UInt
+end
+struct CMD_VOL <: NAIR_CMD
+    volume::UInt
+end
+struct CMD_INF <: NAIR_CMD
+    object::String
+end
 
-"扩充：多参数形式"
-load_cmds(cmds::Vararg{NAIR_CMD_TYPE})::Vector{NAIR_CMD_TYPE} = load_cmds(cmds)
-
-"""
-指令头：表达式⇒表达式头
-"""
-get_head(expr::NAIR_CMD_TYPE)::Symbol = expr.head
-
-"""
-参数集：表达式⇒表达式参数
-"""
-get_args(expr::NAIR_CMD_TYPE)::Vector{Any} = expr.args
-
-"""
-检测单个NAIR命令是否合法
-- 指令头是否在指令集内
-"""
-verify_cmd(cmd::NAIR_CMD_TYPE)::Bool = get_head(cmd) in NAIR_INSTRUCTION_SET
-
-"扩充：迭代器形式"
-verify_cmd(iter::Union{Vector,Tuple,Base.Generator})::Bool = all(verify_cmd, iter)
-
-"扩充：多参数形式"
-verify_cmd(cmds::Vararg{NAIR_CMD_TYPE})::Bool = verify_cmd(cmds)
+#= 其它 =#
+struct CMD_HLP <: NAIR_CMD
+    object::String
+end
+struct CMD_REM <: NAIR_CMD
+    comment::String
+end

@@ -5,10 +5,9 @@
 =#
 
 # 导入
-import ..NAVM: NAVM_Module, 
-               source_type, target_type, transform # 添加方法
-import ..NAIR: NAIR_CMD_TYPE,
-               get_head, get_args
+import ..NAVM: NAVM_Module,
+    source_type, target_type, transform # 添加方法
+import ..NAIR: NAIR_CMD
 # 导出
 export BackendModule
 export target_type
@@ -24,7 +23,7 @@ abstract type BackendModule <: NAVM_Module end
 """
 所有后端模块的「源类型」都是「指令」
 """
-source_type(::BackendModule)::Type = NAIR_CMD_TYPE
+source_type(::BackendModule)::Type = NAIR_CMD
 
 #= 后端模块的「目标类型」仍然抽象，其已于`general.jl/target_type`中定义
 """
@@ -41,22 +40,16 @@ target_type(::BackendModule)::Type = error("未实现的`target_type`方法！")
 - 返回「Vector{目标对象}」：可能一对多，因此需要统一成「目标对象序列」
     - 一个「目标对象」基本对应一行CIN命令
 - ⚠可能返回空数组，表示无解析结果
-"""
-transform(bm::BackendModule, cmd::NAIR_CMD_TYPE) = transform(
-    bm, 
-    Val(get_head(cmd)), # 把指令头当做Val值，分派`Val{指令头}`
-    get_args(cmd)...
-)
 
+【20230903 22:41:07】现在直接针对指令所述的类型作分派
+- 📌未知的指令头会在前端就拦截下来
 """
-(抽象)针对具体指令的转换
-使用带Val的分派，分离对具体命令的解析
-"""
-transform(::BackendModule, ::Val{head}, args::Vararg) where head = error("未实现的`transform@$head$args`方法！")
-# 📌此后不能再使用「::Val{符号}」的特殊解析，会造成「子类/特殊Val」的分派歧义
+transform(::BackendModule, cmd::NAIR_CMD) = error("未实现的`transform@$cmd`方法！")
 
+#= ⚠【20230903 22:42:19】因为直接使用基于类型的分派过程，现在无需使用专门的宏
 
-begin "辅助开发的宏与工具函数"
+begin
+    "辅助开发的宏与工具函数"
 
     """
         @nair_rule SAV(be::BackendModule, name::String, path::String) begin
@@ -107,5 +100,6 @@ begin "辅助开发的宏与工具函数"
         #     transform(::BackendModule, ::Val{$cmd_head}, cmd_args...) = $body
         # )
     end
-    
+
 end
+=#

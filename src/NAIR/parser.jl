@@ -97,7 +97,7 @@ const NAIR_RULES::Dict = Dict(
     :file_path => P.seq(:raw_line),
     #= 元：开头/忽略 =#
     # 入口：NAIR指令 = 头 分隔符 内容 终止符
-        # 通过指令集自动生成规则
+    # 通过指令集自动生成规则
     :instruction => P.first(
         (
             instruction_cmd => P.seq(
@@ -130,18 +130,18 @@ const NAIR_RULES::Dict = Dict(
 const NAIR_FOLDS::Dict = Dict(
     #= 基础数据类型 =#
     # 空值直接返回第一个
-    :ws         => (str, subvals) -> nothing,
-    :spaces     => (str, subvals) -> nothing,
-    :new_line   => (str, subvals) -> nothing,
+    :ws => (str, subvals) -> nothing,
+    :spaces => (str, subvals) -> nothing,
+    :new_line => (str, subvals) -> nothing,
     # 变量名/标识符直接返回字符串
     :var_name => (str, subvals) -> str,
     :identifier => (str, subvals) -> str,
     # 数值
-    :uint            => (str, subvals) -> parse(Int, str),
+    :uint => (str, subvals) -> parse(Int, str),
     :unsigned_number => (str, subvals) -> parse(Float64, str),
     # 特殊格式文本
-    :raw_line        => (str, subvals) -> str,
-    :file_path       => (str, subvals) -> str, # 暂时原路返回
+    :raw_line => (str, subvals) -> str,
+    :file_path => (str, subvals) -> str, # 暂时原路返回
     #= NAIR指令 =#
     # subvals: **NAIR对象**
     :instruction => (str, subvals) -> begin
@@ -152,7 +152,7 @@ const NAIR_FOLDS::Dict = Dict(
     (
         instruction_cmd => (str, subvals) -> dict[:fold_f](
             instruction_cmd,
-            str, 
+            str,
             filter!(!isnothing, subvals)... # 自动过滤并展开
         ) # 自动展开
         for (instruction_cmd, dict) in NAIR_INSTRUCTION_SET
@@ -193,32 +193,32 @@ end
 
 【20230825 15:16:55】Pika解析器不支持在SubString上解析！
 """
-function parse_cmd(str::String)::NAIR_CMD_TYPE
+function parse_cmd(str::String)::NAIR_CMD
 
     state::P.ParserState = P.parse(NAIR_GRAMMAR, str)
 
-    match::Union{Integer, Nothing} = P.find_match_at!(state, NAIR_RULE_START, 1)
-                
+    match::Union{Integer,Nothing} = P.find_match_at!(state, NAIR_RULE_START, 1)
+
     (isnothing(match) || match < 1) && error("NAIR: 解析「$str」失败！match = $match")
 
     return P.traverse_match(
         state, match;
-        fold = (m, p, s) -> get(
-            NAIR_FOLDS, m.rule, 
+        fold=(m, p, s) -> get(
+            NAIR_FOLDS, m.rule,
             _default_fold
-        )(m.view, s),
+        )(m.view, s)
     )
 end
-parse_cmd(str::AbstractString)::NAIR_CMD_TYPE = parse_cmd(string(str))
+parse_cmd(str::AbstractString)::NAIR_CMD = parse_cmd(string(str))
 
 """
 软解析：报错时返回nothing
 """
-function tryparse_cmd(str::String)::Union{NAIR_CMD_TYPE, Nothing}
+function tryparse_cmd(str::String)::Union{NAIR_CMD,Nothing}
     try
         return parse_cmd(str)
     catch
         return nothing
     end
 end
-tryparse_cmd(str::AbstractString)::Union{NAIR_CMD_TYPE, Nothing} = tryparse_cmd(string(str))
+tryparse_cmd(str::AbstractString)::Union{NAIR_CMD,Nothing} = tryparse_cmd(string(str))

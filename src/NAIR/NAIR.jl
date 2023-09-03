@@ -9,12 +9,15 @@ module NAIR
 using JuNarsese
 
 # 数据结构
-include("NAIR/structs.jl")
+include("structs.jl")
+
+# 方法集
+include("methods.jl")
 
 # 指令集
-include("NAIR/instruction_set.jl")
+include("instruction_set.jl")
 
 # 解析器
-include("NAIR/parser.jl")
+include("parser.jl")
 
 end # NAIR

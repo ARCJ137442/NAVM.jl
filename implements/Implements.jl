@@ -13,8 +13,7 @@ using JuNarseseParsers
 using NAVM
 import NAVM: source_type, target_type, transform # 添加方法
 
-
-include("frontends.jl")
-include("backends.jl")
+include("frontend/frontends.jl")
+include("backend/backends.jl")
 
 end

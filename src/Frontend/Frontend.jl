@@ -9,6 +9,6 @@ module Frontend
 using Reexport
 
 # 前端模块
-include("Frontend/module.jl")
+include("module.jl")
 
 end # module
