@@ -13,6 +13,9 @@ begin # 方法实现
     "实现PyNARS的Narsese输入: CommonNarsese"
     transform(::BE_PyNARS, cmd::CMD_NSE) = String[narsese2data(StringParser_ascii, cmd.narsese)]
 
+    "（基于现有版本的ConsolePlus）实现PyNARS的操作符注册（无附加作用）"
+    transform(::BE_PyNARS, cmd::CMD_REG) = String["/reg $(cmd.operator_name)"]
+
     "实现PyNARS的推理步进指令"
     transform(::BE_PyNARS, cmd::CMD_CYC) = String[string(cmd.steps)]
 

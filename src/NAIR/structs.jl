@@ -5,7 +5,7 @@ NAIR的数据结构
 # 导出
 export NARSESE_TYPE
 export NAIR_CMD
-export CMD_SAV, CMD_LOA, CMD_RES, CMD_NSE, CMD_NEW, CMD_DEL, CMD_CYC, CMD_VOL, CMD_INF, CMD_HLP, CMD_REM
+export CMD_SAV, CMD_LOA, CMD_RES, CMD_NSE, CMD_REG, CMD_NEW, CMD_DEL, CMD_CYC, CMD_VOL, CMD_INF, CMD_HLP, CMD_REM
 
 """
 NAVM认为的Narsese类型
@@ -34,6 +34,10 @@ end
 #= IO =#
 struct CMD_NSE <: NAIR_CMD
     narsese::NARSESE_TYPE
+end
+
+struct CMD_REG <: NAIR_CMD
+    operator_name::String
 end
 
 #= CIN控制 =#

@@ -99,6 +99,20 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
             )
         end,
     )
+    :REG => Dict(
+        :type => CMD_REG,
+        :params => [:raw_line], # 剩下的内容都给CommonNarsese解析器解析
+        :help_inf => """
+            注册NARS操作符
+            - 作用于NAL意义上的「操作注册」机制
+            """,
+        :fold_f => (head::Symbol, str::AbstractString, operator_name) -> begin
+            form_cmd(
+                head,
+                string(operator_name)
+            )
+        end,
+    )
     #= CIN控制 =#
     :NEW => Dict(
         :type => CMD_NEW,
