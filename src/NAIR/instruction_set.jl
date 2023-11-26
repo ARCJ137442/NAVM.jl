@@ -55,27 +55,30 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :type => CMD_SAV,
         :params => [:identifier, :file_path],
         :help_inf => """
+            语法：SAV <对象> <路径>
             保存当前数据（记忆）到文件
             """, # 这里的「行首」对齐末尾三引号左侧，在此例中将解析出没有行首空白符的文本
-        :fold_f => (head::Symbol, str::AbstractString, name::AbstractString, path::AbstractString) -> begin
+            :fold_f => (head::Symbol, str::AbstractString, name::AbstractString, path::AbstractString) -> begin
             form_cmd(head, name, path)
         end,
-    )
+        )
     :LOA => Dict(
         :type => CMD_LOA,
         :params => [:identifier, :file_path],
         :help_inf => """
+            语法：LOA <对象> <路径>
             从文件加载数据（记忆）
             """,
-        :fold_f => (head::Symbol, str::AbstractString, name::AbstractString, path::AbstractString) -> begin
+            :fold_f => (head::Symbol, str::AbstractString, name::AbstractString, path::AbstractString) -> begin
             form_cmd(head, name, path)
         end,
-    )
+        )
     :RES => Dict(
         :type => CMD_RES,
         :params => [:identifier],
         :help_inf => """
-            清除CIN数据（记忆）
+            语法：RES <对象>
+            清除CIN数据（如记忆）
             """,
         :fold_f => (head::Symbol, str::AbstractString, name::AbstractString) -> begin
             form_cmd(head, name)
@@ -86,6 +89,7 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :type => CMD_NSE,
         :params => [:raw_line], # 剩下的内容都给CommonNarsese解析器解析
         :help_inf => """
+            语法：NSE <CommonNarsese>
             输入「CommonNarsese」语句
             - 不换行
             - 遵循CommonNarsese语法
@@ -103,6 +107,7 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :type => CMD_REG,
         :params => [:raw_line], # 剩下的内容都给CommonNarsese解析器解析
         :help_inf => """
+            语法：REG <操作符名称（不带尖号）>
             注册NARS操作符
             - 作用于NAL意义上的「操作注册」机制
             """,
@@ -118,6 +123,7 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :type => CMD_NEW,
         :params => [],
         :help_inf => """
+            语法：NEW #无参数#
             创建新推理器
             """,
         :fold_f => (head::Symbol, str::AbstractString, arg...) -> begin
@@ -128,6 +134,7 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :type => CMD_DEL,
         :params => [],
         :help_inf => """
+            语法：DEL #无参数#
             删除(停止)推理器
             """,
         :fold_f => (head::Symbol, str::AbstractString, arg...) -> begin
@@ -138,6 +145,7 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :type => CMD_CYC,
         :params => [:uint],
         :help_inf => """
+            语法：CYC <步进步数(正整数)>
             控制CIN步进
             """,
         :fold_f => (head::Symbol, str::AbstractString, cycles::Integer) -> begin
@@ -151,6 +159,7 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :type => CMD_VOL,
         :params => [:uint],
         :help_inf => """
+            语法：VOL <音量(0~100)>
             控制CIN输出音量
             """,
         :fold_f => (head::Symbol, str::AbstractString, vol::Integer) -> begin
@@ -164,6 +173,7 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :type => CMD_INF,
         :params => [:identifier],
         :help_inf => """
+            语法：INF <对象>
             让CIN输出某类信息
             """,
         :fold_f => (head::Symbol, str::AbstractString, flag) -> begin
@@ -178,6 +188,7 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :type => CMD_HLP,
         :params => [:identifier],
         :help_inf => """
+            语法：HLP <指令名>
             打印帮助文档
             """,
         :fold_f => (head::Symbol, str::AbstractString, arg...) -> begin
@@ -188,9 +199,10 @@ const NAIR_INSTRUCTION_SET::Dict{Symbol,Dict} = Dict([
         :type => CMD_REM,
         :params => [:raw_line],
         :help_inf => """
+            语法：REM <注释内容>
             内容仅作为注释，永不执行
             """,
-        :fold_f => (head::Symbol, str::AbstractString, arg...) -> nothing, # 不解析
+        :fold_f => (head::Symbol, str::AbstractString, comment) -> CMD_REM(string(comment)), # !【2023-11-26 13:40:41】现在翻译成「注释」指令
     )
 ])
 

@@ -50,8 +50,8 @@ const NAIR_RULES::Dict = Dict(
     # :ws => P.many(P.satisfy(isspace)),
     # 非空白: 匹配连续的非空白符号
     :not_ws => P.some(P.satisfy(!isspace)),
-    # 空格符串：至少一个空格符
-    :spaces => P.some(P.token(' ')), # 至少一个空格符
+    # 空白符串：至少一个空白符
+    :spaces => P.some(P.satisfy(isspace)), # 至少一个空白符
     # 换行符：至少一个CR/LF
     :new_line => P.some(
         P.first(
