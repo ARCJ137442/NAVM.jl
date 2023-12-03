@@ -15,10 +15,10 @@ begin
     transform(::BE_ONA, cmd::CMD_NSE) = [narsese2data(StringParser_ascii, cmd.narsese)]
 
     "实现ONA的推理步进指令"
-    transform(::BE_ONA, n::CMD_CYC) = [string(n.steps)]
+    transform(::BE_ONA, cmd::CMD_CYC) = [string(cmd.steps)]
 
     "实现ONA的音量调节"
-    transform(::BE_ONA, n::Integer) = ["*volume=$n"]
+    transform(::BE_ONA, cmd::CMD_VOL) = ["*volume=$(cmd.volume)"]
 
     # # 参考自`InputChannel.py`
     # "实现ONA的信息打印"
