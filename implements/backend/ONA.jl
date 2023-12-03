@@ -15,7 +15,7 @@ begin
     transform(::BE_ONA, cmd::CMD_NSE) = [narsese2data(StringParser_ascii, cmd.narsese)]
 
     "实现ONA的推理步进指令"
-    transform(::BE_ONA, n::CMD_CYC) = [string(n)]
+    transform(::BE_ONA, n::CMD_CYC) = [string(n.steps)]
 
     "实现ONA的音量调节"
     transform(::BE_ONA, n::Integer) = ["*volume=$n"]
