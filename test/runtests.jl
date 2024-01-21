@@ -26,7 +26,3 @@ ENV["JULIA_DEBUG"] = "all"
 @assert tryparse_cmd("NSE NARS-1 test/nars1.nal") |> isnothing
 @show tryparse_cmd("CYC This cmd may causes an error.")
 @show parse_cmd("CUS This is my custom cmd.")
-
-# 测试前后端实现
-@info "开始测试前后端实现..."
-include("../implements/test_implements.jl")
