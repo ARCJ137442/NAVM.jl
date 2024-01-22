@@ -26,13 +26,17 @@ include("#import.jl")
 # %% [6] markdown
 # ## 测试 / 指令集
 
-# %% [7] markdown
-# ### 正常解析
+# %% [7] code
+@testset "指令集" begin
+
 
 # %% [8] markdown
+# ### 正常解析
+
+# %% [9] markdown
 # SAV
 
-# %% [9] code
+# %% [10] code
 let cmd::CMD_SAV = parse_cmd("SAV NARS-1 test/nars1.nal"),
     # 有空格路径 可以
     cmd_allowed = tryparse_cmd("SAV NARS-1 C:\\Program Files\\NARS\\data.nal")
@@ -42,10 +46,10 @@ let cmd::CMD_SAV = parse_cmd("SAV NARS-1 test/nars1.nal"),
     @test cmd_allowed.path == raw"C:\Program Files\NARS\data.nal"
 end
 
-# %% [10] markdown
+# %% [11] markdown
 # LOA
 
-# %% [11] code
+# %% [12] code
 let cmd::CMD_LOA = parse_cmd("LOA NARS-1 test/nars1.nal"),
     # 有空格路径 可以
     cmd_allowed = tryparse_cmd("LOA NARS-1 C:\\Program Files\\NARS\\data.nal")
@@ -55,10 +59,10 @@ let cmd::CMD_LOA = parse_cmd("LOA NARS-1 test/nars1.nal"),
     @test cmd_allowed.path == raw"C:\Program Files\NARS\data.nal"
 end
 
-# %% [12] markdown
+# %% [13] markdown
 # RES
 
-# %% [13] code
+# %% [14] code
 let cmd::CMD_RES = parse_cmd("RES memory"),
     # 使用一个连续标识符 可以
     cmd_allowed::CMD_RES = parse_cmd("RES ^memory!"),
@@ -70,10 +74,10 @@ let cmd::CMD_RES = parse_cmd("RES memory"),
     @test cmd_surplussed.target == "memory"
 end
 
-# %% [14] markdown
+# %% [15] markdown
 # NSE
 
-# %% [15] code
+# %% [16] code
 let cmd::CMD_NSE = parse_cmd("NSE <A --> B>."),
     # 必须符合CommonNarsese语法
     cmd_allowed = tryparse_cmd("NSE A"),
@@ -85,10 +89,10 @@ let cmd::CMD_NSE = parse_cmd("NSE <A --> B>."),
     @test isnothing(cmd_wrong2)
 end
 
-# %% [16] markdown
+# %% [17] markdown
 # NEW
 
-# %% [17] code
+# %% [18] code
 let cmd::CMD_NEW = parse_cmd("NEW reasoner-2"),
     # 多个空格可以
     cmd_allowed1 = tryparse_cmd("NEW    reasoner-?123"),
@@ -105,10 +109,10 @@ let cmd::CMD_NEW = parse_cmd("NEW reasoner-2"),
     @test isnothing(cmd_wrong2)
 end
 
-# %% [18] markdown
+# %% [19] markdown
 # DEL
 
-# %% [19] code
+# %% [20] code
 let cmd::CMD_DEL = parse_cmd("DEL reasoner-2"),
     # 多个空格可以
     cmd_allowed1 = tryparse_cmd("DEL    reasoner-?123"),
@@ -125,10 +129,10 @@ let cmd::CMD_DEL = parse_cmd("DEL reasoner-2"),
     @test isnothing(cmd_wrong2)
 end
 
-# %% [20] markdown
+# %% [21] markdown
 # CYC
 
-# %% [21] code
+# %% [22] code
 let cmd::CMD_CYC = parse_cmd("CYC 1"),
     # 多长度 可以
     cmd_allowed = parse_cmd("CYC    1"),
@@ -147,10 +151,10 @@ let cmd::CMD_CYC = parse_cmd("CYC 1"),
     @test isnothing(cmd_wrong3)
 end
 
-# %% [22] markdown
+# %% [23] markdown
 # VOL
 
-# %% [23] code
+# %% [24] code
 let cmd::CMD_VOL = parse_cmd("VOL 1"),
     # 多长度 可以
     cmd_allowed = parse_cmd("VOL    1"),
@@ -169,10 +173,30 @@ let cmd::CMD_VOL = parse_cmd("VOL 1"),
     @test isnothing(cmd_wrong3)
 end
 
-# %% [24] markdown
+# %% [25] markdown
+# REG
+
+# %% [26] code
+let cmd::CMD_REG = parse_cmd("REG left"),
+    # 多个空格可以
+    cmd_allowed1 = tryparse_cmd("REG    left"),
+    # 附加尾缀可以
+    cmd_allowed2 = tryparse_cmd("REG ^left!!!"),
+    # 用tab不行
+    cmd_wrong1 = tryparse_cmd("REG\tleft"),
+    # 用换行不行
+    cmd_wrong2 = tryparse_cmd("REG \nleft")
+    @test cmd.operator_name == "left"
+    @test !isnothing(cmd_allowed1)
+    @test !isnothing(cmd_allowed2)
+    @test isnothing(cmd_wrong1)
+    @test isnothing(cmd_wrong2)
+end
+
+# %% [27] markdown
 # INF
 
-# %% [25] code
+# %% [28] code
 let cmd::CMD_INF = parse_cmd("INF buffer"),
     # 使用一个连续标识符 可以
     cmd_allowed::CMD_INF = parse_cmd("INF ^buffer!"),
@@ -184,10 +208,10 @@ let cmd::CMD_INF = parse_cmd("INF buffer"),
     @test cmd_surplussed.flag == "buffer"
 end
 
-# %% [26] markdown
+# %% [29] markdown
 # HLP
 
-# %% [27] code
+# %% [30] code
 let cmd::CMD_HLP = parse_cmd("HLP NSE"),
     # 使用一个连续标识符 可以
     cmd_allowed::CMD_HLP = parse_cmd("HLP ^NSE!"),
@@ -199,10 +223,10 @@ let cmd::CMD_HLP = parse_cmd("HLP NSE"),
     @test cmd_surplussed.flag == "NSE"
 end
 
-# %% [28] markdown
+# %% [31] markdown
 # REM
 
-# %% [29] code
+# %% [32] code
 let cmd::CMD_REM = parse_cmd("REM 这是一段注释"),
     # 其它特殊符号 可以
     cmd_allowed::CMD_REM = parse_cmd("REM ^这是一段注释!"),
@@ -214,25 +238,45 @@ let cmd::CMD_REM = parse_cmd("REM 这是一段注释"),
     @test cmd_surplussed.content == "这是一段注释"
 end
 
-# %% [30] markdown
+# %% [33] code
+end # begin @testset
+
+
+# %% [34] markdown
 # ## 测试 / 自定义指令
 
-# %% [31] code
-# 自定义指令
+# %% [35] markdown
+# 定义结构
+
+# %% [36] code
 import NAVM.NAIR: form_cmd
 struct CMD_CUS <: NAIR_CMD
     args
 end
+# 自定义指令
 function form_cmd(::Val{:CUS}, args...)
     @info "自定义指令已捕获！" args
     CMD_CUS(args)
 end
+
+# %% [37] code
+@testset "自定义指令" begin
+
+
+# %% [38] markdown
+# 开始测试
+
+# %% [39] code
 let cus = parse_cmd("CUS This is my custom cmd.")
     @test cus isa NAIR_CMD
     @test cus.args isa Tuple
 end
 
-# %% [32] markdown
+# %% [40] code
+end # begin @testset
+
+
+# %% [41] markdown
 # ## 尝试自编译
 
 

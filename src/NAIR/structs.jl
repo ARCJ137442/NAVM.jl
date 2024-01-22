@@ -5,7 +5,7 @@
 export CMD_SAV, CMD_LOA, CMD_RES, 
        CMD_NSE, 
        CMD_NEW, CMD_DEL, 
-       CMD_CYC, CMD_VOL, CMD_INF, 
+       CMD_CYC, CMD_VOL, CMD_INF, CMD_REG,
        CMD_HLP, CMD_REM
 export NAIR_INSTRUCTION_SET
 
@@ -117,6 +117,18 @@ end
 
 @reg_cmd VOL uint
 form_cmd(::Val{:VOL}, ::AbstractString, volume::Integer) = CMD_VOL(Int(volume))
+
+"""
+    CMD_REG <: NAIR_CMD
+指令：向CIN注册操作（NAL-8）
+- 📌此处的「操作符名」不带尖号「^」，等价于「原子操作」
+"""
+struct CMD_REG <: NAIR_CMD
+    operator_name::String
+end
+
+@reg_cmd REG identifier
+form_cmd(::Val{:REG}, ::AbstractString, operator_name::AbstractString) = CMD_REG(operator_name)
 
 
 #= 其它 =#
