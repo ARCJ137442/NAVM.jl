@@ -215,7 +215,7 @@ let cmd::CMD_REM = parse_cmd("REM 这是一段注释"),
 end
 
 # %% [30] markdown
-# ## 自定义指令 扩展支持
+# ## 测试 / 自定义指令
 
 # %% [31] code
 # 自定义指令

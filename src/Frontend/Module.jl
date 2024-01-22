@@ -26,12 +26,10 @@ abstract type FrontendModule <: NAVM_Module end
 source_type(::FrontendModule)::Type = error("未实现的`source_type`方法！")
 =#
 
-
-#= # ! 前端模块的「目标类型」仍然抽象，其已于`general.jl/target_type`中定义
 """
 所有前端模块的「目标类型」都是「指令」
 """
-target_type(::FrontendModule)::Type = NAIR_CMD =#
+target_type(::FrontendModule)::Type = NAIR_CMD
 
 #= # ! 前端模块的「转换函数」仍然抽象，其已于`general.jl/transform`中定义
 """
