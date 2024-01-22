@@ -1,74 +1,169 @@
-#=
-NAIR的数据结构
+#= NAVM.jl 指令的数据结构定义
+- 定义一系列内置的常用数据结构
 =#
 
-# 导出
-export NAIR_CMD_TYPE
-export form_cmd, load_cmds, get_head, get_args
+export CMD_SAV, CMD_LOA, CMD_RES, 
+       CMD_NSE, 
+       CMD_NEW, CMD_DEL, 
+       CMD_CYC, CMD_VOL, CMD_INF, 
+       CMD_HLP, CMD_REM
+export NAIR_INSTRUCTION_SET
+
+#= 数据存取 =#
 
 """
-直接使用「表达式(Julia的Expr)数组」实现NAIR语句（串）
-- Expr.head: 指令标识符
-- Expr.args: 指令参数
+    CMD_SAV <: NAIR_CMD
+指令：保存当前数据（记忆）到文件
 """
-const NAIR_CMD_TYPE::DataType = Expr
-
-"""
-通过「表达式头+参数集」的形式，提供指令组装API
-- 此处的`head`应为指令集中的一个有效指令
-"""
-function form_cmd(head::Symbol, params...)::NAIR_CMD_TYPE
-    # 检查
-    if head in NAIR_INSTRUCTIONS
-        NAIR_INSTRUCTION_SET[head][:check_f](params...) || error("$head: 参数集「$params」非法！")
-    end
-    # 构建
-    Expr(head, params...)
+struct CMD_SAV <: NAIR_CMD
+    target::String
+    path::String
 end
 
+@reg_cmd SAV identifier file_path
+form_cmd(::Val{:SAV}, ::AbstractString, target::AbstractString, path::AbstractString) = CMD_SAV(
+    String(target), String(path)
+)
+
 """
-通过一个单一的、可空的「参数数组」抽取指令对象
-- 忽略其中的空值
-- 首个非空参数被视作指令头
+    CMD_LOA <: NAIR_CMD
+指令：从文件加载数据（记忆）
 """
-function form_cmd(args::Vector)::NAIR_CMD_TYPE
-    # 过滤
-    params::Vector = filter(!isnothing, args)
-    # 取头
-    head::Symbol = popfirst!(params)
-    # 构建
-    form_cmd(
-        head,
-        params...
+struct CMD_LOA <: NAIR_CMD
+    target::String
+    path::String
+end
+
+@reg_cmd LOA identifier file_path
+form_cmd(::Val{:LOA}, ::AbstractString, target::AbstractString, path::AbstractString) = CMD_LOA(
+    String(target), String(path)
+)
+
+"""
+    CMD_RES <: NAIR_CMD
+指令：清除CIN数据
+- 如：记忆区、缓冲区……
+"""
+struct CMD_RES <: NAIR_CMD
+    target::String
+end
+
+@reg_cmd RES identifier
+form_cmd(::Val{:RES}, ::AbstractString, target::AbstractString) = CMD_RES(target)
+
+
+#= IO =#
+
+"""
+    CMD_NSE <: NAIR_CMD
+指令：输入「CommonNarsese」语句
+- 不换行
+- 遵循CommonNarsese语法
+"""
+struct CMD_NSE <: NAIR_CMD
+    narsese::NarseseObject
+end
+
+@reg_cmd NSE raw_line # 剩下的内容都给CommonNarsese解析器解析
+form_cmd(::Val{:NSE}, ::AbstractString, narsese_str::AbstractString) = CMD_NSE(
+    JuNarsese.StringParser_ascii( # 自动解析成词项
+        string(narsese)
     )
+)
+
+
+#= CIN控制 =#
+
+"""
+    CMD_NEW <: NAIR_CMD
+指令：创建新推理器
+"""
+struct CMD_NEW <: NAIR_CMD
+    name::String
 end
 
-"""
-组装多个命令：迭代器形式
-"""
-load_cmds(cmd_iter::Union{Vector,Tuple,Base.Generator})::Vector{NAIR_CMD_TYPE} = collect(cmd_iter)
-
-"扩充：多参数形式"
-load_cmds(cmds::Vararg{NAIR_CMD_TYPE})::Vector{NAIR_CMD_TYPE} = load_cmds(cmds)
+@reg_cmd NEW
+form_cmd(::Val{:NEW}, str::AbstractString, name::AbstractString) = CMD_NEW(String(name))
 
 """
-指令头：表达式⇒表达式头
+    CMD_DEL <: NAIR_CMD
+指令：删除(停止)推理器
 """
-get_head(expr::NAIR_CMD_TYPE)::Symbol = expr.head
+struct CMD_DEL <: NAIR_CMD
+    name::String
+end
+
+@reg_cmd DEL
+form_cmd(::Val{:DEL}, str::AbstractString, name::AbstractString) = CMD_DEL(String(name))
 
 """
-参数集：表达式⇒表达式参数
+    CMD_CYC <: NAIR_CMD
+指令：控制CIN步进
 """
-get_args(expr::NAIR_CMD_TYPE)::Vector{Any} = expr.args
+struct CMD_CYC <: NAIR_CMD
+    cycles::Int # * 不设置成 `UInt` 是为了避免「1-2 = 0xffffffffffffffff」这样的疏漏
+end
+
+@reg_cmd CYC uint
+form_cmd(::Val{:CYC}, str::AbstractString, cycles::Integer) = CMD_CYC(Int(cycles))
 
 """
-检测单个NAIR命令是否合法
-- 指令头是否在指令集内
+    CMD_VOL <: NAIR_CMD
+指令：控制CIN输出音量
 """
-verify_cmd(cmd::NAIR_CMD_TYPE)::Bool = get_head(cmd) in NAIR_INSTRUCTION_SET
+struct CMD_VOL <: NAIR_CMD
+    volume::Int # * 不设置成 `UInt` 理由同上
+end
 
-"扩充：迭代器形式"
-verify_cmd(iter::Union{Vector,Tuple,Base.Generator})::Bool = all(verify_cmd, iter)
+@reg_cmd VOL uint
+form_cmd(::Val{:VOL}, str::AbstractString, volume::Integer) = CMD_VOL(Int(volume))
 
-"扩充：多参数形式"
-verify_cmd(cmds::Vararg{NAIR_CMD_TYPE})::Bool = verify_cmd(cmds)
+
+#= 其它 =#
+
+"""
+    CMD_INF <: NAIR_CMD
+指令：让CIN输出某类信息
+"""
+struct CMD_INF <: NAIR_CMD
+    flag::String
+end
+
+@reg_cmd INF identifier
+form_cmd(::Val{:INF}, str::AbstractString, flag::AbstractString) = CMD_INF(String(flag))
+
+"""
+    CMD_HLP <: NAIR_CMD
+指令：打印（CIN的）帮助文档
+"""
+struct CMD_HLP <: NAIR_CMD
+    flag::String
+end
+
+@reg_cmd HLP identifier
+form_cmd(::Val{:HLP}, str::AbstractString, flag::AbstractString) = CMD_HLP(String(flag))
+
+"""
+    CMD_REM <: NAIR_CMD
+指令：注释
+- 📌仅存储内容，后续通常翻译为空字串
+"""
+struct CMD_REM <: NAIR_CMD
+    content::String
+end
+
+@reg_cmd REM raw_line
+form_cmd(::Val{:REM}, str::AbstractString, comment::AbstractString) = CMD_REM(String(content))
+
+#= 所有内置指令 =#
+
+"""
+指令集：所有的内置指令
+"""
+const NAIR_INSTRUCTION_SET::Vector{Type} = [
+    CMD_SAV, CMD_LOA, CMD_RES, 
+    CMD_NSE, 
+    CMD_NEW, CMD_DEL, 
+    CMD_CYC, CMD_VOL, CMD_INF, 
+    CMD_HLP, CMD_REM
+]

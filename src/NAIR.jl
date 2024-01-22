@@ -8,11 +8,11 @@ module NAIR
 # 导入
 using JuNarsese
 
-# 数据结构
-include("NAIR/structs.jl")
+# 数据结构接口
+include("NAIR/struct_interface.jl")
 
-# 指令集
-include("NAIR/instruction_set.jl")
+# 数据结构/指令集
+include("NAIR/structs.jl")
 
 # 解析器
 include("NAIR/parser.jl")
