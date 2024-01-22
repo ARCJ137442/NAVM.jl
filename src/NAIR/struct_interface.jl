@@ -4,17 +4,17 @@ NAIR的数据结构接口
 - 后续指令处理均可随类型分派
 =#
 
-# 导入
+# 导出
+export form_cmd, try_form_cmd, 
+       get_head
+export NAIR_CMD
+
 """
 表征JuNarsese可能解析出的数据类型
 - 包含：词项、语句、任务
 - 后续`NSE`指令需要用到
 """
 const NarseseObject = Union{ATerm,ASentence,ATask}
-
-# 导出
-export form_cmd, get_head
-export NAIR_CMD
 
 """
     NAIR_CMD
@@ -55,6 +55,17 @@ function form_cmd(args::Vector)::NAIR_CMD
         head,
         params...
     )
+end
+
+"""
+软解析：报错时返回nothing
+"""
+function try_form_cmd(args::Vararg)::Union{NAIR_CMD, Nothing}
+    try
+        return form_cmd(args...)
+    catch
+        return nothing
+    end
 end
 
 """

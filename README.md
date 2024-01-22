@@ -35,7 +35,7 @@
 ### 中间语 NAIR
 
 - 所有前端转换成的目标语言
-- 所有后端派发命令的源头语言
+- 所有后端分派命令的源头语言
 
 ### ***CommonNarsese***
 
@@ -89,4 +89,4 @@ Pkg.add(url="https://github.com/ARCJ137442/NAVM.jl")
 ### 依赖
 
 - [JuNarsese](https://github.com/ARCJ137442/JuNarsese.jl)
-- [JuNarsese-Parsers](https://github.com/ARCJ137442/JuNarseseParsers.jl)
+- [PikaParser](https://github.com/LCSB-BioCore/PikaParser.jl)

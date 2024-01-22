@@ -35,6 +35,7 @@ transform(::NAVM_Module, ::Any) = error("未实现的`transform`方法！")
 """
 针对「源序列」的转换
 - 按序列执行转换，并过滤掉其中的nothing(失败值)
+- @returns 转换好的所有「目标对象」的序列
 """
 function transform(m::NAVM_Module, args::Vector)
     local sT::Type, tT::Type = source_type(m), target_type(m)
