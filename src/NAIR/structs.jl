@@ -65,7 +65,7 @@ struct CMD_NSE <: NAIR_CMD
 end
 
 @reg_cmd NSE raw_line # 剩下的内容都给CommonNarsese解析器解析
-form_cmd(::Val{:NSE}, ::AbstractString, narsese_str::AbstractString) = CMD_NSE(
+form_cmd(::Val{:NSE}, ::AbstractString, narsese::AbstractString) = CMD_NSE(
     JuNarsese.StringParser_ascii( # 自动解析成词项
         string(narsese)
     )
@@ -82,8 +82,8 @@ struct CMD_NEW <: NAIR_CMD
     name::String
 end
 
-@reg_cmd NEW
-form_cmd(::Val{:NEW}, str::AbstractString, name::AbstractString) = CMD_NEW(String(name))
+@reg_cmd NEW raw_line # * 此处名称应该允许减号`-`等特殊字符
+form_cmd(::Val{:NEW}, ::AbstractString, name::AbstractString) = CMD_NEW(String(name))
 
 """
     CMD_DEL <: NAIR_CMD
@@ -93,8 +93,8 @@ struct CMD_DEL <: NAIR_CMD
     name::String
 end
 
-@reg_cmd DEL
-form_cmd(::Val{:DEL}, str::AbstractString, name::AbstractString) = CMD_DEL(String(name))
+@reg_cmd DEL identifier # * 此处名称应该允许减号`-`等特殊字符
+form_cmd(::Val{:DEL}, ::AbstractString, name::AbstractString) = CMD_DEL(String(name))
 
 """
     CMD_CYC <: NAIR_CMD
@@ -105,7 +105,7 @@ struct CMD_CYC <: NAIR_CMD
 end
 
 @reg_cmd CYC uint
-form_cmd(::Val{:CYC}, str::AbstractString, cycles::Integer) = CMD_CYC(Int(cycles))
+form_cmd(::Val{:CYC}, ::AbstractString, cycles::Integer) = CMD_CYC(Int(cycles))
 
 """
     CMD_VOL <: NAIR_CMD
@@ -116,7 +116,7 @@ struct CMD_VOL <: NAIR_CMD
 end
 
 @reg_cmd VOL uint
-form_cmd(::Val{:VOL}, str::AbstractString, volume::Integer) = CMD_VOL(Int(volume))
+form_cmd(::Val{:VOL}, ::AbstractString, volume::Integer) = CMD_VOL(Int(volume))
 
 
 #= 其它 =#
@@ -130,7 +130,7 @@ struct CMD_INF <: NAIR_CMD
 end
 
 @reg_cmd INF identifier
-form_cmd(::Val{:INF}, str::AbstractString, flag::AbstractString) = CMD_INF(String(flag))
+form_cmd(::Val{:INF}, ::AbstractString, flag::AbstractString) = CMD_INF(String(flag))
 
 """
     CMD_HLP <: NAIR_CMD
@@ -141,7 +141,7 @@ struct CMD_HLP <: NAIR_CMD
 end
 
 @reg_cmd HLP identifier
-form_cmd(::Val{:HLP}, str::AbstractString, flag::AbstractString) = CMD_HLP(String(flag))
+form_cmd(::Val{:HLP}, ::AbstractString, flag::AbstractString) = CMD_HLP(String(flag))
 
 """
     CMD_REM <: NAIR_CMD
@@ -152,8 +152,8 @@ struct CMD_REM <: NAIR_CMD
     content::String
 end
 
-@reg_cmd REM raw_line
-form_cmd(::Val{:REM}, str::AbstractString, comment::AbstractString) = CMD_REM(String(content))
+@reg_cmd REM identifier
+form_cmd(::Val{:REM}, ::AbstractString, content::AbstractString) = CMD_REM(String(content))
 
 #= 所有内置指令 =#
 

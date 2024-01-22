@@ -5,10 +5,12 @@ NAIR解析器
 
 # 导入
 import PikaParser as P
+import Base: parse, tryparse
 
 # 导出
 export NAIR_RULES, NAIR_GRAMMAR, NAIR_FOLDS
 export parse_cmd, tryparse_cmd
+# ! 不会导出`parse, tryparse`
 
 """
 在参数中间隔插入空格
@@ -47,7 +49,7 @@ SAV test.nal
 const NAIR_RULES::Dict = Dict(
     #= 基础数据类型: 用于对接指令集识别 =#
     # 空白: 不限量个空白字符
-    # :ws => P.many(P.satisfy(isspace)),
+    # :ws => P.many(P.satisfy(isspace)), # !【2024-01-22 17:14:57】不启用，因其包含换行符
     # 非空白: 匹配连续的非空白符号
     :not_ws => P.some(P.satisfy(!isspace)),
     # 空格符串：至少一个空格符
@@ -152,16 +154,16 @@ const NAIR_FOLDS::Dict = Dict(
     # *【2024-01-22 14:47:11】引入如此「硬编码」的唯一作用：将「指令参数」的解析交由语法解析器
     # ?【2024-01-22 14:32:19】后续是否需要如此硬编码？如何适应更多样化的需求？
     (
-        cmd_type => (str, subvals) -> form_cmd(
-            Val(cmd_type),
+        get_head(cmd_type) => (str, subvals) -> form_cmd(
+            Val(get_head(cmd_type)),
             str,
             filter!(!isnothing, subvals)... # 自动过滤并展开
         ) # 自动展开
         for cmd_type::Type in NAIR_INSTRUCTION_SET
     )...,
-    # 默认（用户自定义）指令
+    # 默认（用户自定义）指令 | 语法无效指令
     :_DEFAULT => (str, subvals::Vector) -> begin
-        @info "自定义指令通道：" str subvals
+        # @info "自定义指令通道：" str subvals
         args::Vector = filter!(!isnothing, subvals) # 自动过滤
         return form_cmd(Val(Symbol(args[1])), str, args[2:end]...) # 不会溢出
     end,
@@ -182,8 +184,6 @@ const NAIR_GRAMMAR::P.Grammar = P.make_grammar(
 默认Fold
 """
 function _default_fold(str, subvals)
-    # @info "default_fold!"
-    # @show  str subvals
     for element in subvals # 不使用findfirst
         !isnothing(element) && return element
     end
@@ -211,16 +211,20 @@ function parse_cmd(str::String)::NAIR_CMD
         )(m.view, s),
     )
 end
+"重定向：抽象字串⇒字符串"
 parse_cmd(str::AbstractString)::NAIR_CMD = parse_cmd(string(str))
+"重定向：parse方法"
+parse(CMD_TYPE::Type{<:NAIR_CMD}, args::Vararg) = form_cmd(CMD_TYPE, args...)
+parse(::Type{NAIR_CMD}, args::Vararg) = parse_cmd(args...)
 
 """
 软解析：报错时返回nothing
 """
-function tryparse_cmd(str::String)::Union{NAIR_CMD, Nothing}
+function tryparse_cmd(args::Vararg)::Union{NAIR_CMD, Nothing}
     try
-        return parse_cmd(str)
+        return parse_cmd(args...)
     catch
         return nothing
     end
 end
-tryparse_cmd(str::AbstractString)::Union{NAIR_CMD, Nothing} = tryparse_cmd(string(str))
+tryparse(::Type{<:NAIR_CMD}, args::Vararg) = tryparse_cmd(args...)
