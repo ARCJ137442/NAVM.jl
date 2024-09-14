@@ -1,8 +1,18 @@
 # NAVM - NAL's Additional Virtual Machine
 
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
+![GitHub License](https://img.shields.io/github/license/ARCJ137442/NAVM.jl?style=for-the-badge&color=a270ba)
+![Code Size](https://img.shields.io/github/languages/code-size/ARCJ137442/NAVM.jl?style=for-the-badge&color=a270ba)
+![Lines of Code](https://www.aschey.tech/tokei/github.com/ARCJ137442/NAVM.jl?style=for-the-badge&color=a270ba)
+[![Language](https://img.shields.io/badge/language-Julia%201.8+-purple?style=for-the-badge&color=a270ba)](https://cn.julialang.org/)
 
-该项目使用[语义化版本 2.0.0](https://semver.org/)进行版本号管理。
+开发状态：
+
+![Created At](https://img.shields.io/github/created-at/ARCJ137442/NAVM.jl?style=for-the-badge)
+![Last Commit](https://img.shields.io/github/last-commit/ARCJ137442/NAVM.jl?style=for-the-badge)
+
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?style=for-the-badge)](https://conventionalcommits.org)
+
+## 简介
 
 用于统一CIN（NARS计算机实现）输入输出的**抽象语法支持库**
 
